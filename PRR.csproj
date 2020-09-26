@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <Version>0.1.0-beta</Version>
+        <Authors>ConfiG</Authors>
+        <PackageId>com.github.ppr-game.PRR</PackageId>
+        <RepositoryUrl>https://github.com/ppr-game/PRR</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+        <Title>Press Renderer Revolution</Title>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SFML.Net" Version="2.5.0" />
+    </ItemGroup>
+
+</Project>
