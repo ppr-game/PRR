@@ -232,7 +232,7 @@ namespace PRR {
                                                   new Color(foregroundColor.R, foregroundColor.G,
                                                       foregroundColor.B, 0);
                     }
-                    SetCharacter(position, new RenderCharacter(text[0], backgroundColor, useFG));
+                    SetCharacter(position, new RenderCharacter(text[0], backgroundColor, useFG), defaultBackground);
                     return;
                 }
             }
@@ -262,7 +262,7 @@ namespace PRR {
                                               new Color(foregroundColor.R, foregroundColor.G,
                                                   foregroundColor.B, 0);
                 }
-                SetCharacter(charPos, new RenderCharacter(curChar, backgroundColor, useFG));
+                SetCharacter(charPos, new RenderCharacter(curChar, backgroundColor, useFG), defaultBackground);
                 x++;
             }
         }
@@ -283,11 +283,15 @@ namespace PRR {
                     defaultBackground, align, replacingSpaces, invertOnDarkBG);
         }
 
-        public void SetCharacter(Vector2i position, RenderCharacter character) {
+        public void SetCharacter(Vector2i position, RenderCharacter character, Color defaultBackground) {
             if(position.X < 0 || position.Y < 0 || position.X >= width || position.Y >= height) return;
             
             if(IsRenderCharacterEmpty(character)) display.Remove(position);
-            else display[position] = character;
+            else {
+                Color finalBackground =
+                    BlendColors(GetBackgroundColor(position, defaultBackground), character.background);
+                display[position] = new RenderCharacter(finalBackground, character);
+            }
         }
         public RenderCharacter GetCharacter(Vector2i position) {
             return display.ContainsKey(position) ? display[position] : new RenderCharacter('\0', Color.Transparent, Color.Transparent);
@@ -295,10 +299,13 @@ namespace PRR {
         public char GetDisplayedCharacter(Vector2i position) {
             return !display.ContainsKey(position) ? '\0' : display[position].character;
         }
-        public void SetCellColor(Vector2i position, Color foregroundColor, Color backgroundColor) {
+        public void SetCellColor(Vector2i position, Color foregroundColor, Color backgroundColor,
+            Color defaultBackground) {
             if(position.X < 0 || position.Y < 0 || position.X >= width || position.Y >= height) return;
             
-            RenderCharacter newCharacter = new RenderCharacter(backgroundColor, foregroundColor,
+            Color finalBackground = BlendColors(GetBackgroundColor(position, defaultBackground), backgroundColor);
+
+            RenderCharacter newCharacter = new RenderCharacter(finalBackground, foregroundColor,
                 GetCharacter(position));
 
             if(IsRenderCharacterEmpty(newCharacter)) display.Remove(position);
@@ -326,6 +333,17 @@ namespace PRR {
         }
         public static Color AnimateColor(float time, Color start, Color end, float rate) {
             return LerpColors(start, end, time * rate);
+        }
+        public static Color BlendColors(Color bottom, Color top) {
+            switch(top.A) {
+                case 255:
+                    return top;
+                case 0:
+                    return bottom;
+                default:
+                    Color noAlphaBG = new Color(top.R, top.G, top.B, 255);
+                    return LerpColors(bottom, noAlphaBG, top.A / 255f);
+            }
         }
     }
 }

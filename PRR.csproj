@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <Version>0.1.0-beta</Version>
+        <Version>0.1.1-beta</Version>
         <Authors>ConfiG</Authors>
         <PackageId>com.github.ppr-game.PRR</PackageId>
         <RepositoryUrl>https://github.com/ppr-game/PRR</RepositoryUrl>
