@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using SFML.Graphics;
@@ -35,13 +36,17 @@ namespace PRR {
         readonly Vertex[] _backgroundQuads;
         readonly Vertex[] _foregroundQuads;
         public RenderTexture renderTexture { get; }
-        public void RebuildRenderTexture(Color background) {
+        public void RebuildRenderTexture(Color background,
+            Func<Vector2i, RenderCharacter, (Vector2i position, RenderCharacter character)> charactersModifier = null) {
             renderTexture.Clear(background);
 
             uint index = 0;
             foreach((Vector2i key, RenderCharacter value) in text) {
-                int xChar = key.X * _charWidth;
-                int yChar = key.Y * _charHeight;
+                (Vector2i modPos, RenderCharacter modChar) = (key, value);
+                if(charactersModifier != null) (modPos, modChar) = charactersModifier.Invoke(key, value);
+                
+                int xChar = modPos.X * _charWidth;
+                int yChar = modPos.Y * _charHeight;
                 Vector2f position = new Vector2f(xChar, yChar);
     
                 _backgroundQuads[index].Position = position;
@@ -49,12 +54,12 @@ namespace PRR {
                 _backgroundQuads[index + 2].Position = position + new Vector2f(_charWidth, _charHeight);
                 _backgroundQuads[index + 3].Position = position + new Vector2f(0f, _charHeight);
     
-                _backgroundQuads[index].Color = value.background;
-                _backgroundQuads[index + 1].Color = value.background;
-                _backgroundQuads[index + 2].Color = value.background;
-                _backgroundQuads[index + 3].Color = value.background;
+                _backgroundQuads[index].Color = modChar.background;
+                _backgroundQuads[index + 1].Color = modChar.background;
+                _backgroundQuads[index + 2].Color = modChar.background;
+                _backgroundQuads[index + 3].Color = modChar.background;
     
-                if(_font.characters.TryGetValue(value.character, out Vector2f[] texCoords)) {
+                if(_font.characters.TryGetValue(modChar.character, out Vector2f[] texCoords)) {
                     _foregroundQuads[index].Position = _backgroundQuads[index].Position;
                     _foregroundQuads[index + 1].Position = _backgroundQuads[index + 1].Position;
                     _foregroundQuads[index + 2].Position = _backgroundQuads[index + 2].Position;
@@ -65,10 +70,10 @@ namespace PRR {
                     _foregroundQuads[index + 2].TexCoords = texCoords[2];
                     _foregroundQuads[index + 3].TexCoords = texCoords[3];
     
-                    _foregroundQuads[index].Color = value.foreground;
-                    _foregroundQuads[index + 1].Color = value.foreground;
-                    _foregroundQuads[index + 2].Color = value.foreground;
-                    _foregroundQuads[index + 3].Color = value.foreground;
+                    _foregroundQuads[index].Color = modChar.foreground;
+                    _foregroundQuads[index + 1].Color = modChar.foreground;
+                    _foregroundQuads[index + 2].Color = modChar.foreground;
+                    _foregroundQuads[index + 3].Color = modChar.foreground;
                 }
                 else {
                     _foregroundQuads[index].TexCoords = new Vector2f();

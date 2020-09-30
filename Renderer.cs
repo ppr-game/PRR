@@ -5,6 +5,11 @@ using System.IO;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+// ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnassignedField.Global
+// ReSharper disable NotAccessedField.Global
+// ReSharper disable UnusedMember.Global
 
 namespace PRR {
     public readonly struct RenderCharacter {
@@ -69,7 +74,7 @@ namespace PRR {
                 window.SetFramerateLimit(value < 0 ? 0 : (uint)value);
                 window.SetVerticalSyncEnabled(value < 0);
             }
-        }
+        } // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public BitmapText text;
         Sprite _textSprite;
         readonly Image _icon;
@@ -88,6 +93,8 @@ namespace PRR {
         public Vector2f mousePositionF = new Vector2f(-1f, -1f);
         public Vector2i mousePosition = new Vector2i(-1, -1);
         public bool leftButtonPressed;
+
+        public Func<Vector2i, RenderCharacter, (Vector2i position, RenderCharacter character)> charactersModifier;
 
         public Renderer(string title, int width, int height, int framerate, bool fullscreen, string fontPath) {
             this.title = title;
@@ -183,7 +190,7 @@ namespace PRR {
             display.Clear();
         }
         public void Draw(Color background, bool bloom) {
-            text.RebuildRenderTexture(background);
+            text.RebuildRenderTexture(background, charactersModifier);
             
             if(bloom) {
                 _bloomRT1.Clear(background);
@@ -216,7 +223,7 @@ namespace PRR {
         public enum Alignment { Left, Center, Right }
         public void DrawText(Vector2i position, string text, Color foregroundColor, Color backgroundColor,
             Color defaultBackground, Alignment align = Alignment.Left, bool replacingSpaces = false, 
-            bool invertOnDarkBG = false) {
+            bool invertOnDarkBG = false, Func<Vector2i, RenderCharacter, (Vector2i position, RenderCharacter character)> charactersModifier = null) {
             switch(text.Length) {
                 case 0: return; // Don't do anything, if the text is empty
                 case 1: {
@@ -232,7 +239,10 @@ namespace PRR {
                                                   new Color(foregroundColor.R, foregroundColor.G,
                                                       foregroundColor.B, 0);
                     }
-                    SetCharacter(position, new RenderCharacter(text[0], backgroundColor, useFG), defaultBackground);
+                    Vector2i usePos = position;
+                    RenderCharacter useChar = new RenderCharacter(text[0], backgroundColor, useFG);
+                    if(charactersModifier != null) (usePos, useChar) = charactersModifier.Invoke(position, useChar);
+                    SetCharacter(usePos, useChar, defaultBackground);
                     return;
                 }
             }
@@ -262,25 +272,28 @@ namespace PRR {
                                               new Color(foregroundColor.R, foregroundColor.G,
                                                   foregroundColor.B, 0);
                 }
-                SetCharacter(charPos, new RenderCharacter(curChar, backgroundColor, useFG), defaultBackground);
+                Vector2i usePos = charPos;
+                RenderCharacter useChar = new RenderCharacter(curChar, backgroundColor, useFG);
+                if(charactersModifier != null) (usePos, useChar) = charactersModifier.Invoke(charPos, useChar);
+                SetCharacter(usePos, useChar, defaultBackground);
                 x++;
             }
         }
         public void DrawText(Vector2i position, string[] lines, Color foregroundColor, Color backgroundColor,
             Color defaultBackground, Alignment align = Alignment.Left,
             bool replacingSpaces = false,
-            bool invertOnDarkBG = false) {
+            bool invertOnDarkBG = false, Func<Vector2i, RenderCharacter, (Vector2i position, RenderCharacter character)> charactersModifier = null) {
             DrawLines(position, lines, foregroundColor, backgroundColor, defaultBackground, align, replacingSpaces,
-                invertOnDarkBG);
+                invertOnDarkBG, charactersModifier);
         }
         // ReSharper disable once ParameterTypeCanBeEnumerable.Global
         public void DrawLines(Vector2i position, string[] lines, Color foregroundColor, Color backgroundColor,
             Color defaultBackground, Alignment align = Alignment.Left,
             bool replacingSpaces = false,
-            bool invertOnDarkBG = false) {
+            bool invertOnDarkBG = false, Func<Vector2i, RenderCharacter, (Vector2i position, RenderCharacter character)> charactersModifier = null) {
             for(int i = 0; i < lines.Length; i++)
                 DrawText(position + new Vector2i(0, i), lines[i], foregroundColor, backgroundColor,
-                    defaultBackground, align, replacingSpaces, invertOnDarkBG);
+                    defaultBackground, align, replacingSpaces, invertOnDarkBG, charactersModifier);
         }
 
         public void SetCharacter(Vector2i position, RenderCharacter character, Color defaultBackground) {
