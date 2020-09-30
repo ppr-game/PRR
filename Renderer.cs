@@ -110,9 +110,8 @@ namespace PRR {
 
             _icon = new Image(Path.Join("resources", "icon.png"));
 
-            BitmapFont font =
-                new BitmapFont(new Image(Path.Join(fontPath, "font.png")),
-                    fontMappingsLines[1], fontSize);
+            BitmapFont font = new BitmapFont(new Image(Path.Join(fontPath, "font.png")), fontMappingsLines[1],
+                fontSize);
             text = new BitmapText(font, new Vector2i(width, height)) {
                 text = display
             };
@@ -174,7 +173,7 @@ namespace PRR {
                 Position = new Vector2f(windowWidth / 2f, windowHeight / 2f)
             };
 
-            SetFramerateSetting(framerate);
+            this.framerate = framerate;
         }
 
         void UpdateMousePosition(object caller, MouseMoveEventArgs mouse) {
