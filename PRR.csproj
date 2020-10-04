@@ -4,7 +4,7 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <Version>0.1.3-beta-pre11</Version>
         <Authors>ConfiG</Authors>
-        <PackageId>com.github.ppr-game.PRR</PackageId>
+        <PackageId>PRR</PackageId>
         <RepositoryUrl>https://github.com/ppr-game/PRR</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <Title>Press Renderer Revolution</Title>
