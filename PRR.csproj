@@ -10,10 +10,16 @@
         <Title>Press Renderer Revolution</Title>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>The rendering engine used in the rhythm game Press Press Revolution</Description>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageTags>rendering-engine render renderer rendering 2d-graphics</PackageTags>
         <Copyright>PPR</Copyright>
+        <PackageIcon>icon128x.png</PackageIcon>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="LICENSE" Pack="true" PackagePath="\" />
+        <None Include="icon128x.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="SFML.Net" Version="2.5.0" />
