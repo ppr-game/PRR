@@ -33,59 +33,64 @@ namespace PRR {
     }
     public class BitmapText {
         public Dictionary<Vector2i, RenderCharacter> text;
-        readonly Vertex[] _backgroundQuads;
-        readonly Vertex[] _foregroundQuads;
+        readonly Vertex[] _quads;
         public RenderTexture renderTexture { get; }
         public void RebuildRenderTexture(Color background,
             Func<Vector2i, RenderCharacter, (Vector2f position, RenderCharacter character)> charactersModifier = null) {
             renderTexture.Clear(background);
+
+            bool backgroundChar = _font.characters.TryGetValue('█', out Vector2f[] bgTexCoords);
 
             uint index = 0;
             foreach((Vector2i pos, RenderCharacter character) in text) {
                 (Vector2f modPos, RenderCharacter modChar) = ((Vector2f)pos, character);
                 if(charactersModifier != null) (modPos, modChar) = charactersModifier.Invoke(pos, character);
                 
-                int xChar = modPos.X * _charWidth;
-                int yChar = modPos.Y * _charHeight;
-                Vector2f position = new Vector2f(xChar, yChar);
-    
-                _backgroundQuads[index].Position = position;
-                _backgroundQuads[index + 1].Position = position + new Vector2f(_charWidth, 0f);
-                _backgroundQuads[index + 2].Position = position + new Vector2f(_charWidth, _charHeight);
-                _backgroundQuads[index + 3].Position = position + new Vector2f(0f, _charHeight);
-    
-                _backgroundQuads[index].Color = modChar.background;
-                _backgroundQuads[index + 1].Color = modChar.background;
-                _backgroundQuads[index + 2].Color = modChar.background;
-                _backgroundQuads[index + 3].Color = modChar.background;
-    
+                Vector2f position = new Vector2f(modPos.X * _charWidth, modPos.Y * _charHeight);
+
+                _quads[index].Position = position;
+                _quads[index + 1].Position = position + new Vector2f(_charWidth, 0f);
+                _quads[index + 2].Position = position + new Vector2f(_charWidth, _charHeight);
+                _quads[index + 3].Position = position + new Vector2f(0f, _charHeight);
+                
+                if(backgroundChar) {
+                    _quads[index].TexCoords = bgTexCoords[0];
+                    _quads[index + 1].TexCoords = bgTexCoords[1];
+                    _quads[index + 2].TexCoords = bgTexCoords[2];
+                    _quads[index + 3].TexCoords = bgTexCoords[3];
+
+                    _quads[index].Color = modChar.background;
+                    _quads[index + 1].Color = modChar.background;
+                    _quads[index + 2].Color = modChar.background;
+                    _quads[index + 3].Color = modChar.background;
+                }
+
                 if(_font.characters.TryGetValue(modChar.character, out Vector2f[] texCoords)) {
-                    _foregroundQuads[index].Position = _backgroundQuads[index].Position;
-                    _foregroundQuads[index + 1].Position = _backgroundQuads[index + 1].Position;
-                    _foregroundQuads[index + 2].Position = _backgroundQuads[index + 2].Position;
-                    _foregroundQuads[index + 3].Position = _backgroundQuads[index + 3].Position;
+                    _quads[index + 4].Position = _quads[index].Position;
+                    _quads[index + 5].Position = _quads[index + 1].Position;
+                    _quads[index + 6].Position = _quads[index + 2].Position;
+                    _quads[index + 7].Position = _quads[index + 3].Position;
                     
-                    _foregroundQuads[index].TexCoords = texCoords[0];
-                    _foregroundQuads[index + 1].TexCoords = texCoords[1];
-                    _foregroundQuads[index + 2].TexCoords = texCoords[2];
-                    _foregroundQuads[index + 3].TexCoords = texCoords[3];
+                    _quads[index + 4].TexCoords = texCoords[0];
+                    _quads[index + 5].TexCoords = texCoords[1];
+                    _quads[index + 6].TexCoords = texCoords[2];
+                    _quads[index + 7].TexCoords = texCoords[3];
     
-                    _foregroundQuads[index].Color = modChar.foreground;
-                    _foregroundQuads[index + 1].Color = modChar.foreground;
-                    _foregroundQuads[index + 2].Color = modChar.foreground;
-                    _foregroundQuads[index + 3].Color = modChar.foreground;
+                    _quads[index + 4].Color = modChar.foreground;
+                    _quads[index + 5].Color = modChar.foreground;
+                    _quads[index + 6].Color = modChar.foreground;
+                    _quads[index + 7].Color = modChar.foreground;
                 }
                 else {
-                    _foregroundQuads[index].TexCoords = new Vector2f();
-                    _foregroundQuads[index + 1].TexCoords = new Vector2f();
-                    _foregroundQuads[index + 2].TexCoords = new Vector2f();
-                    _foregroundQuads[index + 3].TexCoords = new Vector2f();
+                    _quads[index + 4].TexCoords = new Vector2f();
+                    _quads[index + 5].TexCoords = new Vector2f();
+                    _quads[index + 6].TexCoords = new Vector2f();
+                    _quads[index + 7].TexCoords = new Vector2f();
                 }
     
-                index += 4;
+                index += 8;
             }
-            renderTexture.Draw(_backgroundQuads, 0, (uint)(text.Count * 4), PrimitiveType.Quads);
-            renderTexture.Draw(_foregroundQuads, 0, (uint)(text.Count * 4), PrimitiveType.Quads,
+            renderTexture.Draw(_quads, 0, (uint)(text.Count * 8), PrimitiveType.Quads,
                 new RenderStates(_font.texture));
 
             renderTexture.Display();
@@ -107,8 +112,7 @@ namespace PRR {
             imageWidth = _textWidth * _charWidth;
             imageHeight = _textHeight * _charHeight;
             renderTexture = new RenderTexture(imageWidth, imageHeight);
-            _backgroundQuads = new Vertex[4 * _textWidth * _textHeight];
-            _foregroundQuads = new Vertex[4 * _textWidth * _textHeight];
+            _quads = new Vertex[8 * _textWidth * _textHeight];
         }
     }
 }
