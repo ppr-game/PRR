@@ -37,13 +37,13 @@ namespace PRR {
         readonly Vertex[] _foregroundQuads;
         public RenderTexture renderTexture { get; }
         public void RebuildRenderTexture(Color background,
-            Func<Vector2i, RenderCharacter, (Vector2i position, RenderCharacter character)> charactersModifier = null) {
+            Func<Vector2i, RenderCharacter, (Vector2f position, RenderCharacter character)> charactersModifier = null) {
             renderTexture.Clear(background);
 
             uint index = 0;
-            foreach((Vector2i key, RenderCharacter value) in text) {
-                (Vector2i modPos, RenderCharacter modChar) = (key, value);
-                if(charactersModifier != null) (modPos, modChar) = charactersModifier.Invoke(key, value);
+            foreach((Vector2i pos, RenderCharacter character) in text) {
+                (Vector2f modPos, RenderCharacter modChar) = ((Vector2f)pos, character);
+                if(charactersModifier != null) (modPos, modChar) = charactersModifier.Invoke(pos, character);
                 
                 int xChar = modPos.X * _charWidth;
                 int yChar = modPos.Y * _charHeight;

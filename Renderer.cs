@@ -94,7 +94,7 @@ namespace PRR {
         public Vector2i mousePosition = new Vector2i(-1, -1);
         public bool leftButtonPressed;
 
-        public Func<Vector2i, RenderCharacter, (Vector2i position, RenderCharacter character)> charactersModifier;
+        public Func<Vector2i, RenderCharacter, (Vector2f position, RenderCharacter character)> charactersModifier;
 
         public Renderer(string title, int width, int height, int framerate, bool fullscreen, string fontPath) {
             this.title = title;
@@ -194,7 +194,6 @@ namespace PRR {
             if(bloom) {
                 _bloomRT1.Clear(background);
                 _bloomRT1.Draw(_textSprite);
-                //Texture fullscreenText = new Texture(_bloomRT.Texture);
                 
                 _bloomFirstPass.SetUniform("image", _bloomRT1.Texture);
                 _bloomRT2.Clear(background);
