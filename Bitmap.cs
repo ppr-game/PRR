@@ -34,10 +34,8 @@ namespace PRR {
     public class BitmapText {
         public Dictionary<Vector2i, RenderCharacter> text;
         readonly Vertex[] _quads;
-        public RenderTexture renderTexture { get; }
-        public void RebuildRenderTexture(Color background,
+        public void RebuildQuads(Vector2f offset,
             Func<Vector2i, RenderCharacter, (Vector2f position, RenderCharacter character)> charactersModifier = null) {
-            renderTexture.Clear(background);
 
             bool backgroundChar = _font.characters.TryGetValue('█', out Vector2f[] bgTexCoords);
 
@@ -46,7 +44,7 @@ namespace PRR {
                 (Vector2f modPos, RenderCharacter modChar) = ((Vector2f)pos, character);
                 if(charactersModifier != null) (modPos, modChar) = charactersModifier.Invoke(pos, character);
                 
-                Vector2f position = new Vector2f(modPos.X * _charWidth, modPos.Y * _charHeight);
+                Vector2f position = new Vector2f(modPos.X * _charWidth + offset.X, modPos.Y * _charHeight + offset.Y);
 
                 _quads[index].Position = position;
                 _quads[index + 1].Position = position + new Vector2f(_charWidth, 0f);
@@ -90,10 +88,10 @@ namespace PRR {
     
                 index += 8;
             }
-            renderTexture.Draw(_quads, 0, (uint)(text.Count * 8), PrimitiveType.Quads,
+        }
+        public void DrawQuads(RenderTarget target) {
+            target.Draw(_quads, 0, (uint)(text.Count * 8), PrimitiveType.Quads,
                 new RenderStates(_font.texture));
-
-            renderTexture.Display();
         }
 
         readonly byte _charWidth;
@@ -111,7 +109,6 @@ namespace PRR {
             _textHeight = (uint)size.Y;
             imageWidth = _textWidth * _charWidth;
             imageHeight = _textHeight * _charHeight;
-            renderTexture = new RenderTexture(imageWidth, imageHeight);
             _quads = new Vertex[8 * _textWidth * _textHeight];
         }
     }

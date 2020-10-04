@@ -2,13 +2,17 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <Version>0.1.3-beta-test-6</Version>
+        <Version>0.1.3-beta-pre11</Version>
         <Authors>ConfiG</Authors>
         <PackageId>com.github.ppr-game.PRR</PackageId>
         <RepositoryUrl>https://github.com/ppr-game/PRR</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <Title>Press Renderer Revolution</Title>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>The rendering engine used in the rhythm game Press Press Revolution</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>rendering-engine render renderer rendering 2d-graphics</PackageTags>
+        <Copyright>PPR</Copyright>
     </PropertyGroup>
 
     <ItemGroup>

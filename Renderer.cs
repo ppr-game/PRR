@@ -76,7 +76,7 @@ namespace PRR {
             }
         } // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public BitmapText text;
-        Sprite _textSprite;
+        public Vector2f textPosition;
         readonly Image _icon;
         public RenderWindow window;
         readonly Shader _bloomFirstPass = Shader.FromString(
@@ -168,10 +168,11 @@ namespace PRR {
             }
             _bloomRT1 = new RenderTexture((uint)windowWidth, (uint)windowHeight);
             _bloomRT2 = new RenderTexture((uint)windowWidth, (uint)windowHeight);
-            _textSprite = new Sprite(text.renderTexture.Texture) {
+            textPosition = new Vector2f((windowWidth - text.imageWidth) / 2f, (windowHeight - text.imageHeight) / 2f);
+            /*_textSprite = new Sprite(text.renderTarget.Texture) {
                 Origin = new Vector2f(text.imageWidth / 2f, text.imageHeight / 2f),
                 Position = new Vector2f(windowWidth / 2f, windowHeight / 2f)
-            };
+            };*/
 
             this.framerate = framerate;
         }
@@ -189,11 +190,11 @@ namespace PRR {
             display.Clear();
         }
         public void Draw(Color background, bool bloom) {
-            text.RebuildRenderTexture(background, charactersModifier);
+            text.RebuildQuads(textPosition, charactersModifier);
             
             if(bloom) {
                 _bloomRT1.Clear(background);
-                _bloomRT1.Draw(_textSprite);
+                text.DrawQuads(_bloomRT1);
                 
                 _bloomFirstPass.SetUniform("image", _bloomRT1.Texture);
                 _bloomRT2.Clear(background);
@@ -204,7 +205,7 @@ namespace PRR {
                 _bloomRT1.Draw(new Sprite(_bloomRT2.Texture), new RenderStates(_bloomSecondPass));
                 
                 _bloomRT2.Clear(background);
-                _bloomRT2.Draw(_textSprite);
+                text.DrawQuads(_bloomRT2);
                 
                 _bloomRT1.Display();
                 _bloomRT2.Display();
@@ -215,7 +216,7 @@ namespace PRR {
             }
             else {
                 window.Clear(background);
-                window.Draw(_textSprite);
+                text.DrawQuads(window);
             }
         }
         public enum Alignment { Left, Center, Right }
