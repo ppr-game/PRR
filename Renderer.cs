@@ -169,10 +169,6 @@ namespace PRR {
             _bloomRT1 = new RenderTexture((uint)windowWidth, (uint)windowHeight);
             _bloomRT2 = new RenderTexture((uint)windowWidth, (uint)windowHeight);
             textPosition = new Vector2f((windowWidth - text.imageWidth) / 2f, (windowHeight - text.imageHeight) / 2f);
-            /*_textSprite = new Sprite(text.renderTarget.Texture) {
-                Origin = new Vector2f(text.imageWidth / 2f, text.imageHeight / 2f),
-                Position = new Vector2f(windowWidth / 2f, windowHeight / 2f)
-            };*/
 
             this.framerate = framerate;
         }
@@ -249,7 +245,7 @@ namespace PRR {
             int posX = position.X - align switch
             {
                 Alignment.Right => text.Length - 1,
-                Alignment.Center => (int)MathF.Ceiling(text.Length / 2f),
+                Alignment.Center => (int)MathF.Floor(text.Length / 2f),
                 _ => 0
             };
 
