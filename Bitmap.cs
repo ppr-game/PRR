@@ -19,7 +19,7 @@ namespace PRR {
             texture = new Texture(fontImage);
             for(int y = 0; y < fontImage.Size.Y; y += characterSize.Y) {
                 for(int x = 0; x < fontImage.Size.X; x += characterSize.X) {
-                    if(mappings.Length <= index + 1) break;
+                    if(mappings.Length <= index) break;
                     Vector2f[] texCoords = new Vector2f[4];
                     // Clockwise
                     texCoords[0] = new Vector2f(x, y); // top left
