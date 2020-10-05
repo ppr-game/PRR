@@ -1,4 +1,4 @@
-# Press Rendering Revolution
+# Press Render Revolution
 The rendering engine used in the rhythm game Press Press Revolution
 
 # Installation
